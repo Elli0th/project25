@@ -1,0 +1,81 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: 1fr;
+  height: 100vh;
+  gap: 10px;
+  padding: 20px;
+}
+
+/* Navbar */
+.navbar {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto; /* Ensures the button doesn't stretch */
+  align-items: center;
+  background: #f4f4f4;
+  padding: 10px 20px;
+  width: 100%;
+  gap: 10px; /* Adds spacing between items */
+}
+
+.navbar a {
+  text-decoration: none;
+  color: black;
+  margin-right: 15px;
+}
+
+.btn-navbar {
+  padding: 5px 10px;
+  background: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  width: fit-content; /* Makes the button only as wide as its content */
+  justify-self: end; /* Aligns the button to the right */
+}
+
+
+
+/* Main Layout Grid */
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two equal sections */
+  gap: 20px;
+  width: 80%;
+  margin: auto;
+}
+
+/* Left Section */
+.left-section {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  align-items: start;
+}
+
+.btn {
+  margin-top: 20px;
+  padding: 10px;
+  background: #28a745;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+/* Right Section */
+.right-section {
+  display: grid;
+  place-items: center;
+}
+
+.right-section img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #ddd;
+}
