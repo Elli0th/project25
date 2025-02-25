@@ -1,0 +1,63 @@
+doctype html
+html
+  head
+    title Budget
+    link rel="stylesheet" href="/styles.css"
+    script src="/js/index.js"
+  body
+    .navbar
+      button.btn-navbar Se andras budget
+
+    .container
+      .left-section
+        form action="/budget" method="post"
+          label for="category" Kategori:
+          select name="category" id="category"
+            option value="mat" Mat
+            option value="transport" Transport
+            option value="nöje" Nöje
+            option value="boende" Boende
+            option value="sparande" Sparande/Investerande
+
+          .date-selection
+            label for="year" År:
+            select name="year" id="year" required=true
+              - @years.each do |year|
+                option value=year = year
+
+            label for="month" Månad:
+            select name="month" id="month" required=true
+              - (1..12).each do |month|
+                option value=month = month
+
+            label for="day" Dag:
+            select name="day" id="day" required=true
+              - (1..31).each do |day|
+                option value=day = day
+
+          label for="amount" Summa:
+          input type="number" name="amount" id="amount" required=true
+
+          label for="public" Offentlig:
+          input type="checkbox" name="public" id="public"
+
+          button.btn type="submit" Lägg till budgetpost
+      
+      .right-section
+        h2 Din budgetöversikt
+        .chart-container
+          img src="/chart.png" alt="Budgetdiagram"
+        h1 Budget Overview
+        table
+          thead
+            tr
+              th Category
+              th Amount
+              th Date
+          tbody
+            - @budgets.each do |budget|
+              tr
+                td = budget['Kategori']
+                td = budget['Summa']
+                td = budget['Datum']
+        a href="/" Home
