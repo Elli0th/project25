@@ -1,0 +1,32 @@
+doctype html
+html
+  head
+    title Se andras budget
+    link rel="stylesheet" href="/styles.css"
+  body
+    .navbar
+      a href="/budget"
+        button.btn-navbar Min Budget
+
+    .container
+      h1 Se andras budget
+      
+      - if @public_budgets.empty?
+        p Inga offentliga budgetar hittades.
+      - else
+        table
+          thead
+            tr
+              th Användare
+              th Kategori
+              th Summa
+              th Datum
+          tbody
+            - @public_budgets.each do |budget|
+              tr
+                td = budget["Username"]
+                td = budget["Kategori"]
+                td = budget["Summa"]
+                td = budget["Datum"]
+      
+      a href="/" Home

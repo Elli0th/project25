@@ -1,23 +1,77 @@
 doctype html
 html
   head
-    meta charset="UTF-8"
-    meta name="viewport" content="width=device-width, initial-scale=1.0"
-    title Main Page
-    link rel="stylesheet" href="/css/styles.css"
-
+    title Budget App
+    link rel="stylesheet" href="/styles.css"
+    script src="/js/index.js"
   body
-    nav.navbar
-      a href="#" Link 1
-      a href="#" Link 2
-      button.btn-navbar Btn
-
+    .navbar
+      - if session[:user_id]
+        a href="/budget"
+          button.btn-navbar Min Budget
+        a href="/public_budgets"
+          button.btn-navbar Se andras budget
+        a href="/logout"
+          button.btn-navbar Logga ut
+      - else
+        button.btn-navbar onclick="showLoginPopup()" Logga in
+    
     .container
       .left-section
-        p Some text here...
-        p More text lines...
-        a.btn href="/budget" Go to Budget
-
-
+        h1 Välkommen till Budget App
+        p Håll koll på dina utgifter och se hur andra hanterar sin ekonomi
+        
+        - if session[:user_id]
+          p 
+            | Inloggad som 
+            strong = session[:username]
+          a href="/budget"
+            button.btn Gå till min budget
+        - else
+          p Logga in för att komma åt dina budgetar
+          button.btn onclick="showLoginPopup()" Logga in / Skapa konto
+      
       .right-section
-        img src="/img/budget_test_img.jpg" alt="Image"
+        img src="/img/budget_test_img.jpg" alt="Budget illustration"
+    
+    / Login/Signup Popup
+    #popup-overlay.popup-overlay
+      .popup-container
+        span#popup-close.popup-close &times;
+        
+        .popup-tabs
+          .popup-tab.active data-target="login-content" Logga in
+          .popup-tab data-target="signup-content" Skapa konto
+        
+        .popup-content
+          #login-content.tab-content.active
+            - if @login_error
+              .error-message = @login_error
+            form action="/login" method="post"
+              .form-group
+                label for="login-username" Användarnamn
+                input type="text" id="login-username" name="username" required="true"
+              
+              .form-group
+                label for="login-password" Lösenord
+                input type="password" id="login-password" name="password" required="true"
+              
+              button type="submit" Logga in
+          
+          #signup-content.tab-content
+            - if @signup_error
+              .error-message = @signup_error
+            form action="/signup" method="post"
+              .form-group
+                label for="signup-username" Användarnamn
+                input type="text" id="signup-username" name="username" required="true"
+              
+              .form-group
+                label for="signup-password" Lösenord
+                input type="password" id="signup-password" name="password" required="true"
+              
+              .form-group
+                label for="signup-confirm" Bekräfta lösenord
+                input type="password" id="signup-confirm" name="confirm_password" required="true"
+              
+              button type="submit" Skapa konto
