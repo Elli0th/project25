@@ -1,0 +1,59 @@
+doctype html
+html
+  head
+    title Redigera Budget
+    link rel="stylesheet" href="/styles.css"
+    script src="/js/index.js"
+  body
+    .navbar
+      a href="/budget"
+        button.btn-navbar Tillbaka till budget
+      a href="/public_budgets"
+        button.btn-navbar Se andras budget
+      a href="/logout"
+        button.btn-navbar Logga ut
+    
+    .container
+      h2 Redigera budget
+
+      - if session[:error]
+        .error-message = session[:error]
+        - session.delete(:error)
+
+      form action="/budget/#{@budget['id']}/update" method="post"
+        .form-group
+          label for="category" Kategori:
+          select name="category" id="category"
+            option value="mat" selected=(@budget['Kategori'] == 'mat') Mat
+            option value="transport" selected=(@budget['Kategori'] == 'transport') Transport
+            option value="nöje" selected=(@budget['Kategori'] == 'nöje') Nöje
+            option value="boende" selected=(@budget['Kategori'] == 'boende') Boende
+            option value="sparande" selected=(@budget['Kategori'] == 'sparande') Sparande/Investerande
+        
+        .form-group
+          label for="amount" Summa:
+          input type="number" id="amount" name="amount" step="0.01" value=@budget['Summa'] required="required"
+        
+        .form-group
+          label for="date" Datum:
+          .date-selectors
+            select name="year" id="year" required="required"
+              - @years.each do |y|
+                option value=y selected=(@year == y) = y
+          
+            select name="month" id="month" required="required"
+              - (1..12).each do |m|
+                option value=m selected=(@month == m) = m
+            
+            select name="day" id="day" required="required"
+              - (1..31).each do |d|
+                option value=d selected=(@day == d) = d
+        
+        .form-group
+          label for="public" Offentlig:
+          input type="checkbox" name="public" id="public" checked=@is_public
+        
+        .form-actions
+          button.btn type="submit" Spara ändringar
+          a href="/budget"
+            button.btn type="button" Avbryt

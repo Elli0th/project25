@@ -207,6 +207,141 @@ post '/budget' do
   redirect '/budget'
 end
 
+# Delete budget route - add this after your existing budget routes
+post '/budget/:id/delete' do
+  redirect '/' unless logged_in?
+  
+  budget_id = params[:id].to_i
+  current_user_id = session[:user_id]
+  
+  db = SQLite3::Database.new('db/slutprojekt_db_2025.db', { timeout: 5000 })
+  
+  begin
+    # First verify the budget belongs to current user
+    owner_check = db.get_first_value("SELECT user_id FROM Budget WHERE id = #{budget_id}")
+    
+    if owner_check.to_i == current_user_id
+      db.transaction
+      
+      # Delete any permissions first
+      db.execute("DELETE FROM Permissions WHERE budget_id = #{budget_id}")
+      
+      # Then delete the budget item
+      db.execute("DELETE FROM Budget WHERE id = #{budget_id} AND user_id = #{current_user_id}")
+      
+      db.commit
+    else
+      session[:error] = "Du har inte behörighet att ta bort denna budgetpost"
+    end
+  rescue SQLite3::Exception => e
+    db.rollback if db.transaction_active?
+    session[:error] = "Ett fel uppstod: #{e.message}"
+  ensure
+    db.close if db
+  end
+  
+  redirect '/budget'
+end
+
+# Edit budget form route
+get '/budget/:id/edit' do
+  redirect '/' unless logged_in?
+  
+  budget_id = params[:id].to_i
+  current_user_id = session[:user_id]
+  
+  db = SQLite3::Database.new('db/slutprojekt_db_2025.db', { timeout: 5000 })
+  db.results_as_hash = true
+  
+  begin
+    # First check if this budget belongs to the current user
+    @budget = db.execute("SELECT * FROM Budget WHERE id = #{budget_id} AND user_id = #{current_user_id}").first
+    
+    if @budget.nil?
+      session[:error] = "Du har inte behörighet att redigera denna budgetpost"
+      redirect '/budget'
+    end
+    
+    # Check if this budget is public
+    is_public_check = db.get_first_value("SELECT COUNT(*) FROM Permissions WHERE budget_id = #{budget_id} AND user_id = 0")
+    @is_public = (is_public_check.to_i > 0)
+    
+    # Get date components
+    date_parts = @budget['Datum'].split('-')
+    @year = date_parts[0].to_i
+    @month = date_parts[1].to_i
+    @day = date_parts[2].to_i
+    
+    # For date selector
+    current_year = Time.now.year
+    @years = (current_year-5..current_year+5).to_a
+    
+  rescue SQLite3::Exception => e
+    session[:error] = "Ett fel uppstod: #{e.message}"
+    redirect '/budget'
+  ensure
+    db.close if db
+  end
+  
+  slim :edit_budget
+end
+
+# Update budget route
+post '/budget/:id/update' do
+  redirect '/' unless logged_in?
+  
+  budget_id = params[:id].to_i
+  current_user_id = session[:user_id]
+  
+  category = params[:category]
+  amount = params[:amount].to_f
+  is_public = params[:public] ? true : false
+  
+  # Get date components
+  year = params[:year].to_i
+  month = params[:month].to_i
+  day = params[:day].to_i
+  
+  # Format date
+  date = "#{year}-#{month.to_s.rjust(2, '0')}-#{day.to_s.rjust(2, '0')}"
+  
+  db = SQLite3::Database.new('db/slutprojekt_db_2025.db', { timeout: 5000 })
+  
+  begin
+    # First verify the budget belongs to current user
+    owner_check = db.get_first_value("SELECT user_id FROM Budget WHERE id = #{budget_id}")
+    
+    if owner_check.to_i == current_user_id
+      db.transaction
+      
+      # Update the budget entry
+      db.execute("UPDATE Budget SET Kategori = '#{category}', Summa = #{amount}, Datum = '#{date}' WHERE id = #{budget_id}")
+      
+      # Handle public/private status
+      public_exists = db.get_first_value("SELECT COUNT(*) FROM Permissions WHERE budget_id = #{budget_id} AND user_id = 0")
+      
+      if is_public && public_exists.to_i == 0
+        # Add public permission
+        db.execute("INSERT INTO Permissions (budget_id, user_id, permission_type) VALUES (#{budget_id}, 0, 'View')")
+      elsif !is_public && public_exists.to_i > 0
+        # Remove public permission
+        db.execute("DELETE FROM Permissions WHERE budget_id = #{budget_id} AND user_id = 0")
+      end
+      
+      db.commit
+    else
+      session[:error] = "Du har inte behörighet att uppdatera denna budgetpost"
+    end
+  rescue SQLite3::Exception => e
+    db.rollback if db.transaction_active?
+    session[:error] = "Ett fel uppstod: #{e.message}"
+  ensure
+    db.close if db
+  end
+  
+  redirect '/budget'
+end
+
 # Public budgets route
 get '/public_budgets' do
   redirect '/' unless logged_in?

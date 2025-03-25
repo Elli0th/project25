@@ -174,6 +174,10 @@ body {
 .error-message {
   color: red;
   margin-bottom: 15px;
+  background-color: #ffebee;
+  padding: 10px;
+  border-radius: 4px;
+  border-left: 4px solid #d32f2f;
 }
 
 /* Tab content */
@@ -198,4 +202,68 @@ body {
   background-color: #666;
   padding: 3px 6px;
   border-radius: 3px;
+}
+
+/* New styles for edit and delete functionality */
+.small-btn {
+  padding: 5px 10px;
+  margin: 2px;
+  font-size: 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+}
+
+.small-btn:hover {
+  background-color: #45a049;
+}
+
+.delete-btn {
+  background-color: #f44336;
+}
+
+.delete-btn:hover {
+  background-color: #da190b;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+th, td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+tr:hover {
+  background-color: #f5f5f5;
+}
+
+.form-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+/* Date selector styles */
+.date-selectors {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.date-selectors select {
+  padding: 5px;
+  border-radius: 3px;
+  border: 1px solid #ddd;
 }

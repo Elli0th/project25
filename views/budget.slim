@@ -8,7 +8,9 @@ html
     .navbar
       a href="/public_budgets"
         button.btn-navbar Se andras budget
-
+      a href="/logout"
+        button.btn-navbar Logga ut
+    
     .container
       .left-section
         form action="/budget" method="post"
@@ -19,46 +21,68 @@ html
             option value="nöje" Nöje
             option value="boende" Boende
             option value="sparande" Sparande/Investerande
-
+          
           .date-selection
             label for="year" År:
             select name="year" id="year" required=true
               - @years.each do |year|
                 option value=year = year
-
+            
             label for="month" Månad:
             select name="month" id="month" required=true
               - (1..12).each do |month|
                 option value=month = month
-
+            
             label for="day" Dag:
             select name="day" id="day" required=true
               - (1..31).each do |day|
                 option value=day = day
-
+          
           label for="amount" Summa:
           input type="number" name="amount" id="amount" required=true
-
+          
           label for="public" Offentlig:
           input type="checkbox" name="public" id="public"
-
+          
           button.btn type="submit" Lägg till budgetpost
-      
+          
       .right-section
         h2 Din budgetöversikt
         .chart-container
           img src="/chart.png" alt="Budgetdiagram"
         h1 Budget Overview
+        
+        - if session[:error]
+          .error-message = session[:error]
+          - session.delete(:error)
+        
         table
           thead
             tr
-              th Category
-              th Amount
-              th Date
+              th Kategori
+              th Summa
+              th Datum
+              th Offentlig
+              th Åtgärder
           tbody
             - @budgets.each do |budget|
               tr
                 td = budget['Kategori']
                 td = budget['Summa']
                 td = budget['Datum']
+                td 
+                  - if budget['is_public'] == 1
+                    | Ja
+                    form action="/toggle_visibility/#{budget['id']}" method="post" style="display: inline;"
+                      button.small-btn type="submit" Gör privat
+                  - else
+                    | Nej
+                    form action="/toggle_visibility/#{budget['id']}" method="post" style="display: inline;"
+                      button.small-btn type="submit" Gör offentlig
+                td
+                  a href="/budget/#{budget['id']}/edit"
+                    button.small-btn Redigera
+                  form action="/budget/#{budget['id']}/delete" method="post" style="display: inline;" onsubmit="return confirm('Är du säker på att du vill ta bort denna budgetpost?');"
+                    button.small-btn.delete-btn type="submit" Ta bort
+        
         a href="/" Home
