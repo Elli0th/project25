@@ -1,8 +1,10 @@
+# Budget application main controller
+# Handles HTTP requests and responses using the Sinatra framework
+
 require 'sinatra'
 require 'slim'
-require 'sqlite3'
 require 'sinatra/reloader' if development?
-require 'bcrypt'
+require_relative 'model'
 
 # Enable sessions
 enable :sessions
@@ -13,88 +15,30 @@ set :session_secret, '7a6238b91650180c4a718d25f8faca5b64f0a2b41dc02bb8769c0bf8cc
 set :public_folder, File.dirname(__FILE__) + '/public'
 
 # Home page route
+# @return [String] rendered index template
 get '/' do
   slim :index
 end
 
-# Login route
+# Login page route
+# @return [String] rendered login template or redirect to home
+get '/login' do
+  redirect '/' if logged_in?
+  slim :user_login
+end
+
+# Process login form submission
+# @return [String] redirect to home or rendered login template with error
 post '/login' do
   username = params[:username]
   password = params[:password]
   
-  begin
-    db = SQLite3::Database.new('db/slutprojekt_db_2025.db')
-    db.results_as_hash = true
-    
-    # Find user by username
-    query = "SELECT * FROM User WHERE Username = '#{username}'"
-    user = db.execute(query).first
-    
-    if user && BCrypt::Password.new(user['Password']) == password
-      # Set session
-      session[:user_id] = user['id']
-      session[:username] = user['Username']
-      
-      # Set cookie for JavaScript to check
-      response.set_cookie('user_logged_in', {
-        value: true,
-        path: '/',
-        max_age: 86400 # 1 day
-      })
-      
-      redirect '/budget'
-    else
-      @login_error = "Felaktigt användarnamn eller lösenord"
-      slim :index
-    end
-  ensure
-    db.close if db
-  end
-end
-
-# Signup route
-post '/signup' do
-  username = params[:username]
-  password = params[:password]
-  confirm_password = params[:confirm_password]
+  user = BudgetModel.authenticate_user(username, password)
   
-  # Validate input
-  if password != confirm_password
-    @signup_error = "Lösenorden matchar inte"
-    return slim :index
-  end
-  
-  if username.empty? || password.empty?
-    @signup_error = "Alla fält måste fyllas i"
-    return slim :index
-  end
-  
-  # Hash the password
-  password_hash = BCrypt::Password.create(password)
-  
-  begin
-    db = SQLite3::Database.new('db/slutprojekt_db_2025.db')
-    db.results_as_hash = true
-    
-    # Check if username already exists
-    existing_query = "SELECT COUNT(*) as count FROM User WHERE Username = '#{username}'"
-    existing_user = db.execute(existing_query).first
-    
-    if existing_user['count'] > 0
-      @signup_error = "Användarnamnet är redan taget"
-      return slim :index
-    end
-    
-    # Create new user
-    insert_query = "INSERT INTO User (Username, Password) VALUES ('#{username}', '#{password_hash}')"
-    db.execute(insert_query)
-    
-    # Get the new user's ID
-    new_user_id = db.last_insert_row_id
-    
+  if user
     # Set session
-    session[:user_id] = new_user_id
-    session[:username] = username
+    session[:user_id] = user['id']
+    session[:username] = user['Username']
     
     # Set cookie for JavaScript to check
     response.set_cookie('user_logged_in', {
@@ -103,16 +47,56 @@ post '/signup' do
       max_age: 86400 # 1 day
     })
     
-    redirect '/budget'
-  rescue SQLite3::Exception => e
-    @signup_error = "Ett fel uppstod: #{e.message}"
-    slim :index
-  ensure
-    db.close if db
+    redirect '/'
+  else
+    @login_error = "Felaktigt användarnamn eller lösenord"
+    slim :user_login
+  end
+end
+
+# Registration page route
+# @return [String] rendered registration template or redirect to home
+get '/register' do
+  redirect '/' if logged_in?
+  slim :user_register
+end
+
+# Process registration form submission
+# @return [String] redirect to home or rendered registration template with error
+post '/signup' do
+  username = params[:username]
+  password = params[:password]
+  confirm_password = params[:confirm_password]
+  
+  # Validate input
+  if password != confirm_password
+    @signup_error = "Lösenorden matchar inte"
+    return slim :user_register
+  end
+  
+  result = BudgetModel.register_user(username, password)
+  
+  if result[:success]
+    # Set session
+    session[:user_id] = result[:user_id]
+    session[:username] = result[:username]
+    
+    # Set cookie for JavaScript to check
+    response.set_cookie('user_logged_in', {
+      value: true,
+      path: '/',
+      max_age: 86400 # 1 day
+    })
+    
+    redirect '/'
+  else
+    @signup_error = result[:error]
+    slim :user_register
   end
 end
 
 # Logout route
+# @return [String] redirect to home
 get '/logout' do
   session.clear
   response.delete_cookie('user_logged_in')
@@ -121,12 +105,28 @@ end
 
 # Authentication helper methods
 helpers do
+  # Check if a user is logged in
+  # @return [Boolean] true if user is logged in, false otherwise
   def logged_in?
     !session[:user_id].nil?
   end
   
+  # Get the current user's ID
+  # @return [Integer, nil] the current user's ID or nil if not logged in
   def current_user
     session[:user_id]
+  end
+  
+  # Check if current user is an admin
+  # @return [Boolean] true if user is admin, false otherwise
+  def is_admin?
+    session[:is_admin] == true
+  end
+
+  # Require admin privileges, redirect if not admin
+  # @return [nil]
+  def require_admin
+    redirect '/' unless logged_in? && is_admin?
   end
 end
 
@@ -140,38 +140,29 @@ before '/public_budgets' do
 end
 
 # Budget routes
+
+# View all budget items for current user
+# @return [String] rendered budget template
 get '/budget' do
   redirect '/' unless logged_in?
   
   current_year = Time.now.year
   @years = (current_year-5..current_year+5).to_a
   
-  db = SQLite3::Database.new('db/slutprojekt_db_2025.db', { timeout: 5000 })
-  db.results_as_hash = true
-  
-  # Get budget items with their public status
   current_user_id = session[:user_id]
-  
-  @budgets = db.execute(<<-SQL
-    SELECT b.*, 
-           CASE WHEN p.id IS NOT NULL THEN 1 ELSE 0 END AS is_public
-    FROM Budget b
-    LEFT JOIN Permissions p ON b.id = p.budget_id AND p.user_id = 0
-    WHERE b.user_id = #{current_user_id}
-  SQL
-  )
-  
-  db.close
+  @budgets = BudgetModel.get_budgets_for_user(current_user_id)
     
   slim :budget
 end
 
+# Create a new budget item
+# @return [String] redirect to budget page
 post '/budget' do
   redirect '/' unless logged_in?
   
   category = params[:category]
   amount = params[:amount].to_i
-  is_public = params[:public] ? true : false  # Check if "Offentlig" checkbox is checked
+  is_public = params[:public] ? true : false
   
   # Get date components
   year = params[:year].to_i
@@ -180,113 +171,66 @@ post '/budget' do
   
   # Format the date as YYYY-MM-DD for SQLite
   date = "#{year}-#{month.to_s.rjust(2, '0')}-#{day.to_s.rjust(2, '0')}"
-  current_user_id = session[:user_id]
   
-  db = SQLite3::Database.new('db/slutprojekt_db_2025.db', { timeout: 5000 })
+  result = BudgetModel.create_budget_item(session[:user_id], category, amount, date, is_public)
   
-  begin
-    db.transaction
-    
-    # Insert the budget entry
-    db.execute("INSERT INTO Budget (Kategori, Summa, user_id, Datum) VALUES ('#{category}', #{amount}, #{current_user_id}, '#{date}')")
-    
-    # If it's marked as public, create a permission
-    if is_public
-      budget_id = db.last_insert_row_id
-      db.execute("INSERT INTO Permissions (budget_id, user_id, permission_type) VALUES (#{budget_id}, 0, 'View')")
-    end
-    
-    db.commit
-  rescue SQLite3::Exception => e
-    db.rollback
-    puts "Error occurred: #{e.message}"
-  ensure
-    db.close
+  if !result[:success]
+    session[:error] = result[:error]
   end
   
   redirect '/budget'
 end
 
-# Delete budget route - add this after your existing budget routes
+# Delete a budget item
+# @return [String] redirect to budget page
 post '/budget/:id/delete' do
   redirect '/' unless logged_in?
   
   budget_id = params[:id].to_i
   current_user_id = session[:user_id]
   
-  db = SQLite3::Database.new('db/slutprojekt_db_2025.db', { timeout: 5000 })
+  result = BudgetModel.delete_budget_item(budget_id, current_user_id)
   
-  begin
-    # First verify the budget belongs to current user
-    owner_check = db.get_first_value("SELECT user_id FROM Budget WHERE id = #{budget_id}")
-    
-    if owner_check.to_i == current_user_id
-      db.transaction
-      
-      # Delete any permissions first
-      db.execute("DELETE FROM Permissions WHERE budget_id = #{budget_id}")
-      
-      # Then delete the budget item
-      db.execute("DELETE FROM Budget WHERE id = #{budget_id} AND user_id = #{current_user_id}")
-      
-      db.commit
-    else
-      session[:error] = "Du har inte behörighet att ta bort denna budgetpost"
-    end
-  rescue SQLite3::Exception => e
-    db.rollback if db.transaction_active?
-    session[:error] = "Ett fel uppstod: #{e.message}"
-  ensure
-    db.close if db
+  if !result[:success]
+    session[:error] = result[:error]
   end
   
   redirect '/budget'
 end
 
 # Edit budget form route
+# @return [String] rendered edit_budget template or redirect to budget
 get '/budget/:id/edit' do
   redirect '/' unless logged_in?
   
   budget_id = params[:id].to_i
   current_user_id = session[:user_id]
   
-  db = SQLite3::Database.new('db/slutprojekt_db_2025.db', { timeout: 5000 })
-  db.results_as_hash = true
+  result = BudgetModel.get_budget_item(budget_id, current_user_id)
   
-  begin
-    # First check if this budget belongs to the current user
-    @budget = db.execute("SELECT * FROM Budget WHERE id = #{budget_id} AND user_id = #{current_user_id}").first
-    
-    if @budget.nil?
-      session[:error] = "Du har inte behörighet att redigera denna budgetpost"
-      redirect '/budget'
-    end
-    
-    # Check if this budget is public
-    is_public_check = db.get_first_value("SELECT COUNT(*) FROM Permissions WHERE budget_id = #{budget_id} AND user_id = 0")
-    @is_public = (is_public_check.to_i > 0)
-    
-    # Get date components
-    date_parts = @budget['Datum'].split('-')
-    @year = date_parts[0].to_i
-    @month = date_parts[1].to_i
-    @day = date_parts[2].to_i
-    
-    # For date selector
-    current_year = Time.now.year
-    @years = (current_year-5..current_year+5).to_a
-    
-  rescue SQLite3::Exception => e
-    session[:error] = "Ett fel uppstod: #{e.message}"
+  if !result[:success]
+    session[:error] = result[:error]
     redirect '/budget'
-  ensure
-    db.close if db
   end
+  
+  @budget = result[:budget]
+  @is_public = result[:is_public]
+  
+  # Get date components
+  date_parts = @budget['Datum'].split('-')
+  @year = date_parts[0].to_i
+  @month = date_parts[1].to_i
+  @day = date_parts[2].to_i
+  
+  # For date selector
+  current_year = Time.now.year
+  @years = (current_year-5..current_year+5).to_a
   
   slim :edit_budget
 end
 
-# Update budget route
+# Update a budget item
+# @return [String] redirect to budget page
 post '/budget/:id/update' do
   redirect '/' unless logged_in?
   
@@ -305,94 +249,127 @@ post '/budget/:id/update' do
   # Format date
   date = "#{year}-#{month.to_s.rjust(2, '0')}-#{day.to_s.rjust(2, '0')}"
   
-  db = SQLite3::Database.new('db/slutprojekt_db_2025.db', { timeout: 5000 })
+  result = BudgetModel.update_budget_item(budget_id, current_user_id, category, amount, date, is_public)
   
-  begin
-    # First verify the budget belongs to current user
-    owner_check = db.get_first_value("SELECT user_id FROM Budget WHERE id = #{budget_id}")
-    
-    if owner_check.to_i == current_user_id
-      db.transaction
-      
-      # Update the budget entry
-      db.execute("UPDATE Budget SET Kategori = '#{category}', Summa = #{amount}, Datum = '#{date}' WHERE id = #{budget_id}")
-      
-      # Handle public/private status
-      public_exists = db.get_first_value("SELECT COUNT(*) FROM Permissions WHERE budget_id = #{budget_id} AND user_id = 0")
-      
-      if is_public && public_exists.to_i == 0
-        # Add public permission
-        db.execute("INSERT INTO Permissions (budget_id, user_id, permission_type) VALUES (#{budget_id}, 0, 'View')")
-      elsif !is_public && public_exists.to_i > 0
-        # Remove public permission
-        db.execute("DELETE FROM Permissions WHERE budget_id = #{budget_id} AND user_id = 0")
-      end
-      
-      db.commit
-    else
-      session[:error] = "Du har inte behörighet att uppdatera denna budgetpost"
-    end
-  rescue SQLite3::Exception => e
-    db.rollback if db.transaction_active?
-    session[:error] = "Ett fel uppstod: #{e.message}"
-  ensure
-    db.close if db
+  if !result[:success]
+    session[:error] = result[:error]
   end
   
   redirect '/budget'
 end
 
 # Public budgets route
+# @return [String] rendered public_budgets template
 get '/public_budgets' do
   redirect '/' unless logged_in?
   
-  db = SQLite3::Database.new('db/slutprojekt_db_2025.db', { timeout: 5000 })
-  db.results_as_hash = true
-  
-  @public_budgets = db.execute(<<-SQL
-    SELECT b.*, u.Username
-    FROM Budget b
-    JOIN Permissions p ON b.id = p.budget_id AND p.user_id = 0
-    JOIN User u ON b.user_id = u.id
-    ORDER BY b.Datum DESC
-  SQL
-  )
-  
-  db.close
+  @public_budgets = BudgetModel.get_public_budgets
   
   slim :public_budgets
 end
 
-# Toggle visibility route
+# Toggle budget visibility between public and private
+# @return [String] redirect to budget page
 post '/toggle_visibility/:id' do
   redirect '/' unless logged_in?
   
   budget_id = params[:id].to_i
   current_user_id = session[:user_id]
   
-  db = SQLite3::Database.new('db/slutprojekt_db_2025.db', { timeout: 5000 })
+  result = BudgetModel.toggle_budget_visibility(budget_id, current_user_id)
   
-  begin
-    # Check if this budget belongs to the current user
-    owner_check = db.get_first_value("SELECT COUNT(*) FROM Budget WHERE id = #{budget_id} AND user_id = #{current_user_id}")
-    
-    if owner_check.to_i > 0
-      # Check if this budget already has a public permission
-      public_exists = db.get_first_value("SELECT id FROM Permissions WHERE budget_id = #{budget_id} AND user_id = 0")
-      
-      if public_exists
-        # Remove public permission (make private)
-        db.execute("DELETE FROM Permissions WHERE budget_id = #{budget_id} AND user_id = 0")
-      else
-        # Add public permission (make public)
-        db.execute("INSERT INTO Permissions (budget_id, user_id, permission_type) VALUES (#{budget_id}, 0, 'View')")
-      end
-    end
-  rescue SQLite3::Exception => e
-    puts "Error occurred: #{e.message}"
-  ensure
-    db.close
+  if !result[:success]
+    session[:error] = result[:error]
   end
   
   redirect '/budget'
+end
+
+# Admin routes
+
+# Admin login page
+# @return [String] rendered admin_login template or redirect
+get '/admin' do
+  redirect '/' if logged_in? && !is_admin?
+  slim :admin_login
+end
+
+# Process admin login
+# @return [String] redirect to admin dashboard or rendered admin_login with error
+post '/admin/login' do
+  username = params[:username]
+  password = params[:password]
+  
+  user = BudgetModel.authenticate_admin(username, password)
+  
+  if user
+    # Set session
+    session[:user_id] = user['id']
+    session[:username] = user['Username']
+    session[:is_admin] = true
+    
+    redirect '/admin/dashboard'
+  else
+    @login_error = "Invalid admin credentials"
+    slim :admin_login
+  end
+end
+
+# Admin dashboard
+# @return [String] rendered admin_dashboard template
+get '/admin/dashboard' do
+  require_admin
+  
+  @users = BudgetModel.get_all_users
+  
+  slim :admin_dashboard
+end
+
+# Delete a user (admin only)
+# @return [String] redirect to admin dashboard
+post '/admin/users/:id/delete' do
+  require_admin
+  
+  user_id = params[:id].to_i
+  admin_id = session[:user_id]
+  
+  result = BudgetModel.delete_user(user_id, admin_id)
+  
+  if result[:success]
+    session[:success] = "User account deleted successfully"
+  else
+    session[:error] = result[:error]
+  end
+  
+  redirect '/admin/dashboard'
+end
+
+# Admin setup page
+# @return [String] rendered create_admin template
+get '/setup/admin' do
+  slim :create_admin
+end
+
+# Process admin creation
+# @return [String] rendered create_admin template with success or error
+post '/setup/admin' do
+  username = params[:username]
+  password = params[:password]
+  admin_key = params[:admin_key]
+  
+  # Security check with your provided key
+  if admin_key != "NoIjKY8It2eu1xURfwGx"
+    @error = "Invalid admin setup key"
+    return slim :create_admin
+  end
+  
+  result = BudgetModel.create_admin_user(username, password)
+  
+  if result[:success]
+    @success = "Admin account created successfully"
+  else
+    @error = result[:error]
+  end
+  
+  slim :create_admin
 end

@@ -1,0 +1,65 @@
+// user_register.slim
+//
+// Purpose: Provides the user registration form
+// Author: Budget App Developer
+// Version: 1.0
+//
+// This template renders the registration form with fields for:
+// - Username
+// - Password with strength indicator
+// - Password confirmation with matching validation
+// - Terms acceptance checkbox
+// - Submit button
+// Also handles error messages from failed registration attempts
+
+doctype html
+html
+  head
+    title Skapa konto - Budget App
+    link rel="stylesheet" href="/styles.css"
+    script src="/js/index.js"
+  body
+    .navbar
+      a href="/"
+        button.btn-navbar Hem
+      a href="/login"
+        button.btn-navbar Logga in
+    
+    .container.register-page
+      .register-container
+        h1 Skapa konto
+        
+        - if @signup_error
+          .error-message
+            i.error-icon
+            = @signup_error
+            
+        form action="/signup" method="post" id="signup-form"
+          .form-group
+            label for="username" Välj användarnamn
+            .input-wrapper
+              i.user-icon
+              input type="text" id="username" name="username" required="true" minlength="4" placeholder="Minst 4 tecken"
+              span.validation-message
+          
+          .form-group
+            label for="password" Välj lösenord
+            .input-wrapper
+              i.password-icon
+              input type="password" id="password" name="password" required="true" minlength="6" placeholder="Minst 6 tecken" oninput="checkPasswordStrength(this.value)"
+              button.password-toggle type="button" aria-label="Visa/Dölj lösenord" onclick="togglePassword('password')"
+            .password-strength
+              span.strength-bar
+              span.strength-text Lösenordsstyrka
+          
+          .form-group
+            label for="confirm_password" Bekräfta lösenord
+            .input-wrapper
+              i.password-icon
+              input type="password" id="confirm_password" name="confirm_password" required="true" placeholder="Upprepa lösenord" oninput="checkPasswordsMatch()"
+              button.password-toggle type="button" aria-label="Visa/Dölj lösenord" onclick="togglePassword('confirm_password')"
+              span.passwords-match-icon
+          
+          button.signup-button type="submit" 
+            span.btn-text Skapa konto
+            span.btn-icon →

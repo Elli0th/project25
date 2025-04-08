@@ -1,0 +1,31 @@
+doctype html
+html
+  head
+    title Create Admin Account - Budget App
+    link rel="stylesheet" href="/styles.css"
+  body
+    .container
+      h1 Create Admin Account
+      
+      - if @error
+        .error-message = @error
+      
+      - if @success
+        .success-message = @success
+      
+      form action="/setup/admin" method="post"
+        .form-group
+          label for="username" Admin Username
+          input type="text" id="username" name="username" required="true"
+        
+        .form-group
+          label for="password" Admin Password
+          input type="password" id="password" name="password" required="true"
+          
+        .form-group
+          label for="admin_key" Admin Setup Key
+          input type="password" id="admin_key" name="admin_key" required="true"
+        
+        button.btn type="submit" Create Admin Account
+      
+      a href="/" Return to Main Site
