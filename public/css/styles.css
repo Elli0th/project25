@@ -1,19 +1,27 @@
 /**
- * Stylesheet for the Budget App
+ * Main Stylesheet for Budget App
  * 
- * Provides styling for:
- * - Layout (Grid-based)
+ * This stylesheet defines the visual appearance and layout of the application
+ * It is organized into sections:
+ * - Base styles (reset, typography, general elements)
+ * - Layout (grid structure, containers)
  * - Navigation
- * - Form elements
- * - Tables
- * - Budget status indicators
- * - Password strength visualization
- * - Login and registration forms
- * - Admin dashboard
- * - Error and success messages
+ * - Forms and inputs
+ * - Tables and data display
+ * - Status indicators
+ * - Button styles
+ * - Utility classes
+ * - Page-specific styles
+ * 
+ * @author Budget App Developer
+ * @version 1.0
  */
 
-* {
+/**
+ * Base styles
+ * Reset default browser styling and set base typography
+ */
+ * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -29,7 +37,58 @@ body {
   padding: 20px;
 }
 
-/* Navbar */
+/**
+ * Layout
+ * Define the overall structure of the application
+ */
+/* Main container for page content */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+/* Welcome page specific layout */
+.welcome-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Left section for text content */
+.left-section {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  align-items: start;
+}
+
+/* Right section for images or charts */
+.right-section {
+  display: grid;
+  place-items: center;
+}
+
+.right-section img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #ddd;
+}
+
+/* Login and register page layout */
+.login-page, .register-page {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+/**
+ * Navigation
+ * Styles for the top navigation bar
+ */
 .navbar {
   display: grid;
   grid-template-columns: auto auto 1fr auto; /* Ensures the button doesn't stretch */
@@ -55,23 +114,11 @@ body {
   width: fit-content; /* Makes the button only as wide as its content */
   justify-self: end; /* Aligns the button to the right */
 }
-  
-/* Main Layout Grid */
-.container {
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* Two equal sections */
-  gap: 20px;
-  width: 80%;
-  margin: auto;
-}
 
-/* Left Section */
-.left-section {
-  display: grid;
-  grid-template-rows: auto auto auto;
-  align-items: start;
-}
-
+/**
+ * Button Styles
+ * Different button types used throughout the application
+ */
 .btn {
   margin-top: 20px;
   padding: 10px;
@@ -81,145 +128,12 @@ body {
   cursor: pointer;
 }
 
-/* Right Section */
-.right-section {
-  display: grid;
-  place-items: center;
-}
-
-.right-section img {
-  max-width: 100%;
-  height: auto;
-  border: 1px solid #ddd;
-}
-
-/* Popup Styles */
-.popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
+.button-group {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  margin-top: 20px;
 }
 
-.popup-overlay.active {
-  visibility: visible;
-  opacity: 1;
-}
-
-.popup-container {
-  background: white;
-  padding: 20px;
-  border-radius: 5px;
-  width: 90%;
-  max-width: 400px;
-  position: relative;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-}
-
-.popup-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.popup-tabs {
-  display: flex;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #ddd;
-}
-
-.popup-tab {
-  padding: 10px 15px;
-  cursor: pointer;
-  background: #f5f5f5;
-  margin-right: 5px;
-  border-radius: 5px 5px 0 0;
-}
-
-.popup-tab.active {
-  background: #007bff;
-  color: white;
-}
-
-.popup-content form {
-  display: flex;
-  flex-direction: column;
-}
-
-.popup-content input {
-  margin-bottom: 15px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.popup-content button {
-  padding: 10px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.popup-content button:hover {
-  background: #0069d9;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-}
-
-.error-message {
-  color: red;
-  margin-bottom: 15px;
-  background-color: #ffebee;
-  padding: 10px;
-  border-radius: 4px;
-  border-left: 4px solid #d32f2f;
-}
-
-/* Tab content */
-.tab-content {
-  display: none;
-}
-
-.tab-content.active {
-  display: block;
-}
-
-/* Status indicators for budget items */
-.public {
-  color: white;
-  background-color: green;
-  padding: 3px 6px;
-  border-radius: 3px;
-}
-
-.private {
-  color: white;
-  background-color: #666;
-  padding: 3px 6px;
-  border-radius: 3px;
-}
-
-/* New styles for edit and delete functionality */
+/* Small buttons for tables and compact UI elements */
 .small-btn {
   padding: 5px 10px;
   margin: 2px;
@@ -235,6 +149,7 @@ body {
   background-color: #45a049;
 }
 
+/* Delete button variant */
 .delete-btn {
   background-color: #f44336;
 }
@@ -243,6 +158,334 @@ body {
   background-color: #da190b;
 }
 
+/**
+ * Form Styling
+ * Styles for form elements including inputs, labels, and validation
+ */
+.form-group {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #555;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper i {
+  position: absolute;
+  left: 12px;
+  color: #aaa;
+  font-size: 16px;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 12px 40px 12px 35px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.input-wrapper input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  outline: none;
+}
+
+.input-wrapper input::placeholder {
+  color: #bbb;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 5px;
+}
+
+/* Form options row (remember me, forgot password) */
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 15px 0 25px;
+  font-size: 13px;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+}
+
+.remember-me input {
+  margin-right: 8px;
+}
+
+.forgot-password {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+/* Form buttons */
+.login-button, .signup-button {
+  width: 100%;
+  padding: 14px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.login-button:hover, .signup-button:hover {
+  background: #0069d9;
+}
+
+.btn-icon {
+  transition: transform 0.2s;
+}
+
+.login-button:hover .btn-icon, .signup-button:hover .btn-icon {
+  transform: translateX(5px);
+}
+
+/* Form actions container */
+.form-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+/* Additional form text */
+.form-text {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  color: #666;
+}
+
+/**
+ * Date selectors
+ * Styling for date selection dropdowns
+ */
+.date-selectors {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.date-selectors select {
+  padding: 5px;
+  border-radius: 3px;
+  border: 1px solid #ddd;
+}
+
+/**
+ * Login and Registration Containers
+ * Styling for the login and registration forms
+ */
+.login-container, .register-container {
+  max-width: 450px;
+  margin: 40px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+}
+
+.login-container h1, .register-container h1 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+/**
+ * Error and Success Messages
+ * Styling for notification messages
+ */
+.error-message {
+  color: #d32f2f;
+  margin-bottom: 20px;
+  background-color: #fef0f0;
+  padding: 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.error-icon {
+  font-size: 18px;
+  color: #d32f2f;
+}
+
+.success-message {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+
+/**
+ * Password Strength Indicator
+ * Visual feedback for password strength
+ */
+.password-strength {
+  margin-top: 8px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.strength-bar {
+  height: 4px;
+  width: 70%;
+  background: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.strength-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  transition: width 0.3s, background 0.3s;
+}
+
+.strength-bar.weak::before {
+  width: 30%;
+  background: #ff5252;
+}
+
+.strength-bar.medium::before {
+  width: 60%;
+  background: #ffb74d;
+}
+
+.strength-bar.strong::before {
+  width: 100%;
+  background: #4caf50;
+}
+
+.strength-text {
+  color: #888;
+}
+
+/**
+ * Terms and Privacy Section
+ * Styling for terms acceptance checkbox
+ */
+.terms-privacy {
+  margin-bottom: 25px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.terms-privacy input {
+  margin-top: 3px;
+}
+
+.terms-privacy a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.terms-privacy a:hover {
+  text-decoration: underline;
+}
+
+/**
+ * Password Validation Icons
+ * Visual indicators for password match status
+ */
+.validation-message {
+  font-size: 12px;
+  margin-top: 5px;
+  position: absolute;
+  bottom: -20px;
+  color: #d32f2f;
+}
+
+.passwords-match-icon {
+  position: absolute;
+  right: 40px;
+  display: none;
+}
+
+.passwords-match-icon.match {
+  display: block;
+  color: #4caf50;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%234caf50' viewBox='0 0 16 16'%3E%3Cpath d='M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z'/%3E%3C/svg%3E");
+}
+
+.passwords-match-icon.mismatch {
+  display: block;
+  color: #d32f2f;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23d32f2f' viewBox='0 0 16 16'%3E%3Cpath d='M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z'/%3E%3C/svg%3E");
+}
+
+/**
+ * Icon Styles
+ * SVG icons used throughout the application
+ */
+.icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.user-icon {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' viewBox='0 0 16 16'%3E%3Cpath d='M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c0-.001 0-.002 0-.004 0-.993-1.166-2.505-5-2.505S3 7.996 3 8.996c0 .002 0 .003 0 .004H13z'/%3E%3C/svg%3E");
+}
+
+.password-icon {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' viewBox='0 0 16 16'%3E%3Cpath d='M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z'/%3E%3Cpath d='M9.5 6.5a1.5 1.5 0 0 1-1 1.415l.385 1.99a.5.5 0 0 1-.491.595h-.788a.5.5 0 0 1-.49-.595l.384-1.99a1.5 1.5 0 1 1 2-1.415z'/%3E%3C/svg%3E");
+}
+
+/**
+ * Table Styles
+ * Styling for data tables
+ */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -264,26 +507,10 @@ tr:hover {
   background-color: #f5f5f5;
 }
 
-.form-actions {
-  margin-top: 20px;
-  display: flex;
-  gap: 10px;
-}
-
-/* Date selector styles */
-.date-selectors {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.date-selectors select {
-  padding: 5px;
-  border-radius: 3px;
-  border: 1px solid #ddd;
-}
-
-/* Admin styles */
+/**
+ * Admin Styles
+ * Special styling for admin interfaces
+ */
 .admin-login {
   max-width: 500px;
   margin: 50px auto;
@@ -291,15 +518,6 @@ tr:hover {
   background: #f9f9f9;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-.success-message {
-  color: #155724;
-  background-color: #d4edda;
-  border-color: #c3e6cb;
-  padding: 12px;
-  margin-bottom: 20px;
-  border-radius: 4px;
 }
 
 .admin-table {
@@ -322,9 +540,20 @@ tr:hover {
   background-color: #f1f1f1;
 }
 
-.form-text {
-  display: block;
-  margin-top: 5px;
-  font-size: 12px;
-  color: #666;
+/**
+ * Status Indicators
+ * Visual indicators for item status
+ */
+.public {
+  color: white;
+  background-color: green;
+  padding: 3px 6px;
+  border-radius: 3px;
+}
+
+.private {
+  color: white;
+  background-color: #666;
+  padding: 3px 6px;
+  border-radius: 3px;
 }

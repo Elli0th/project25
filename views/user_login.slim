@@ -1,59 +1,44 @@
 // user_login.slim
 //
-// Purpose: Provides the login form for users
-// Author: Budget App Developer
-// Version: 1.0
-//
-// This template renders the login form with fields for:
-// - Username
-// - Password
-// - Remember me checkbox
-// - Submit button
-// Also handles error messages from failed login attempts
+// Login page with username and password form
+// Also displays any error messages from login attempts
 
-doctype html
-html
-  head
-    title Logga in - Budget App
-    link rel="stylesheet" href="/styles.css"
-    script src="/js/index.js"
-  body
-    .navbar
-      a href="/"
-        button.btn-navbar Hem
-      a href="/register"
-        button.btn-navbar Skapa konto
+layout :layout
+
+.login-page
+  .login-container
+    h1 Login
     
-    .container.login-page
-      .login-container
-        h1 Logga in
-        
-        - if @login_error
-          .error-message
-            i.error-icon
-            = @login_error
-            
-        form action="/login" method="post"
-          .form-group
-            label for="username" Användarnamn
-            .input-wrapper
-              i.user-icon
-              input type="text" id="username" name="username" required="true" placeholder="Ditt användarnamn"
-          
-          .form-group
-            label for="password" Lösenord
-            .input-wrapper
-              i.password-icon
-              input type="password" id="password" name="password" required="true" placeholder="Ditt lösenord"
-              button.password-toggle type="button" aria-label="Visa/Dölj lösenord" onclick="togglePassword('password')"
-          
-          .form-options
-            .remember-me
-              input type="checkbox" id="remember-me" name="remember_me"
-              label for="remember-me" Kom ihåg mig
-            
-            a.forgot-password href="#" Glömt lösenord?
-          
-          button.login-button type="submit" 
-            span.btn-text Logga in
-            span.btn-icon →
+    // Show error message if there is one
+    - if @login_error
+      .error-message
+        i.error-icon
+        = @login_error
+    
+    // Login form
+    form action="/login" method="post"
+      // Username field
+      .form-group
+        label for="username" Username
+        .input-wrapper
+          i.user-icon
+          input type="text" id="username" name="username" required="true" placeholder="Your username"
+      
+      // Password field with show/hide function
+      .form-group
+        label for="password" Password
+        .input-wrapper
+          i.password-icon
+          input type="password" id="password" name="password" required="true" placeholder="Your password"
+          button.password-toggle type="button" aria-label="Show/Hide password" onclick="togglePassword('password')"
+      
+      // Additional options (remember me, forgot password)
+      .form-options
+        .remember-me
+          input type="checkbox" id="remember-me" name="remember_me"
+          label for="remember-me" Remember me
+      
+      // Login button with arrow icon
+      button.login-button type="submit" 
+        span.btn-text Login
+        span.btn-icon →

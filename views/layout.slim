@@ -1,0 +1,19 @@
+// layout.slim
+//
+// Main layout for the application used by all pages
+// Contains the basic HTML structure and includes the navbar
+
+doctype html
+html
+  head
+    title Budget App
+    link rel="stylesheet" href="/styles.css"
+    script src="/js/index.js"
+  body
+    // Include navbar and pass the session data
+    == slim :layout_navbar, locals: {session: session}
+    
+    // Container for the page's main content
+    .container
+      // Yield renders the content from the current view
+      == yield

@@ -1,0 +1,32 @@
+// layout_navbar.slim
+//
+// Reusable navbar component shown on all pages
+// Displays different navigation options based on user login status
+
+.navbar
+  // Home button is always visible
+  a href="/"
+    button.btn-navbar Home
+  
+  // Show these buttons only if user is logged in
+  - if session[:user_id]
+    a href="/budget"
+      button.btn-navbar My Budget
+    a href="/public_budgets"
+      button.btn-navbar See Other Budgets
+    
+    // Show Admin button only if user is an admin
+    - if session[:is_admin]
+      a href="/admin/dashboard"
+        button.btn-navbar Admin
+    
+    // Logout button
+    a href="/logout"
+      button.btn-navbar Logout
+  
+  // Show these buttons only if user is NOT logged in
+  - else
+    a href="/login"
+      button.btn-navbar Login
+    a href="/register"
+      button.btn-navbar Register

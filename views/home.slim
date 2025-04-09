@@ -1,0 +1,34 @@
+// index.slim
+//
+// Home page shown when user visits the application
+// Displays welcome message and different buttons based on login status
+
+
+layout :layout
+
+.welcome-container
+  .left-section
+    h1 Welcome to Budget App
+    p Keep track of your expenses and see how others manage their finances
+    
+    // If user is logged in, show their username and a button to the budget page
+    - if session[:user_id]
+      p 
+        | Logged in as 
+        strong = session[:username]
+      a href="/budget"
+        button.btn Go to My Budget
+    
+    // If user is not logged in, show buttons to login or register
+    - else
+      p Log in to access your budgets
+      .button-group
+        // Direct links to login and register pages instead of JavaScript callbacks
+        a href="/login"
+          button.btn Login
+        a href="/register" style="margin-left: 10px;"
+          button.btn Register
+  
+  // Right section with an illustrative image
+  .right-section
+    img src="/img/budget_test_img.jpg" alt="Budget illustration"

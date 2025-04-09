@@ -1,59 +1,58 @@
-doctype html
-html
-  head
-    title Redigera Budget
-    link rel="stylesheet" href="/styles.css"
-    script src="/js/index.js"
-  body
-    .navbar
-      a href="/budget"
-        button.btn-navbar Tillbaka till budget
-      a href="/public_budgets"
-        button.btn-navbar Se andras budget
-      a href="/logout"
-        button.btn-navbar Logga ut
-    
-    .container
-      h2 Redigera budget
+// edit_budget.slim
+//
+// Form for editing an existing budget item
+// Pre-populates fields with current values
 
-      - if session[:error]
-        .error-message = session[:error]
-        - session.delete(:error)
+h2 Edit Budget
 
-      form action="/budget/#{@budget['id']}/update" method="post"
-        .form-group
-          label for="category" Kategori:
-          select name="category" id="category"
-            option value="mat" selected=(@budget['Kategori'] == 'mat') Mat
-            option value="transport" selected=(@budget['Kategori'] == 'transport') Transport
-            option value="nöje" selected=(@budget['Kategori'] == 'nöje') Nöje
-            option value="boende" selected=(@budget['Kategori'] == 'boende') Boende
-            option value="sparande" selected=(@budget['Kategori'] == 'sparande') Sparande/Investerande
-        
-        .form-group
-          label for="amount" Summa:
-          input type="number" id="amount" name="amount" step="0.01" value=@budget['Summa'] required="required"
-        
-        .form-group
-          label for="date" Datum:
-          .date-selectors
-            select name="year" id="year" required="required"
-              - @years.each do |y|
-                option value=y selected=(@year == y) = y
+// Display error message if there is one
+- if session[:error]
+  .error-message = session[:error]
+  - session.delete(:error)
+
+// Edit form with current values pre-selected
+form action="/budget/#{@budget['id']}/update" method="post"
+  // Category selection
+  .form-group
+    label for="category" Category:
+    select name="category" id="category"
+      option value="mat" selected=(@budget['Kategori'] == 'mat') Food
+      option value="transport" selected=(@budget['Kategori'] == 'transport') Transport
+      option value="nöje" selected=(@budget['Kategori'] == 'nöje') Entertainment
+      option value="boende" selected=(@budget['Kategori'] == 'boende') Housing
+      option value="sparande" selected=(@budget['Kategori'] == 'sparande') Savings/Investments
           
-            select name="month" id="month" required="required"
-              - (1..12).each do |m|
-                option value=m selected=(@month == m) = m
-            
-            select name="day" id="day" required="required"
-              - (1..31).each do |d|
-                option value=d selected=(@day == d) = d
-        
-        .form-group
-          label for="public" Offentlig:
-          input type="checkbox" name="public" id="public" checked=@is_public
-        
-        .form-actions
-          button.btn type="submit" Spara ändringar
-          a href="/budget"
-            button.btn type="button" Avbryt
+  // Amount field
+  .form-group
+    label for="amount" Amount:
+    input type="number" id="amount" name="amount" step="0.01" value=@budget['Summa'] required="required"
+          
+  // Date selectors
+  .form-group
+    label for="date" Date:
+    .date-selectors
+      // Year selection with current year pre-selected
+      select name="year" id="year" required="required"
+        - @years.each do |y|
+          option value=y selected=(@year == y) = y
+      
+      // Month selection with current month pre-selected        
+      select name="month" id="month" required="required"
+        - (1..12).each do |m|
+          option value=m selected=(@month == m) = m
+      
+      // Day selection with current day pre-selected        
+      select name="day" id="day" required="required"
+        - (1..31).each do |d|
+          option value=d selected=(@day == d) = d
+          
+  // Public/private toggle
+  .form-group
+    label for="public" Public:
+    input type="checkbox" name="public" id="public" checked=@is_public
+          
+  // Action buttons
+  .form-actions
+    button.btn type="submit" Save Changes
+    a href="/budget"
+      button.btn type="button" Cancel

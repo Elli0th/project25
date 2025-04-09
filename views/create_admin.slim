@@ -1,31 +1,35 @@
-doctype html
-html
-  head
-    title Create Admin Account - Budget App
-    link rel="stylesheet" href="/styles.css"
-  body
-    .container
-      h1 Create Admin Account
+// create_admin.slim
+//
+// Page for creating the initial admin account
+// Requires an admin key for security
+
+.login-page
+  .login-container
+    h1 Create Admin Account
+    
+    // Error message display
+    - if @error
+      .error-message = @error
+    
+    // Success message display
+    - if @success
+      .success-message = @success
+    
+    // Admin creation form
+    form action="/setup/admin" method="post"
+      .form-group
+        label for="username" Admin Username
+        input type="text" id="username" name="username" required="true"
       
-      - if @error
-        .error-message = @error
-      
-      - if @success
-        .success-message = @success
-      
-      form action="/setup/admin" method="post"
-        .form-group
-          label for="username" Admin Username
-          input type="text" id="username" name="username" required="true"
+      .form-group
+        label for="password" Admin Password
+        input type="password" id="password" name="password" required="true"
         
-        .form-group
-          label for="password" Admin Password
-          input type="password" id="password" name="password" required="true"
-          
-        .form-group
-          label for="admin_key" Admin Setup Key
-          input type="password" id="admin_key" name="admin_key" required="true"
-        
-        button.btn type="submit" Create Admin Account
+      // Admin key field for security
+      .form-group
+        label for="admin_key" Admin Setup Key
+        input type="password" id="admin_key" name="admin_key" required="true"
+        small.form-text This is a security measure. The key is set in the application code.
       
-      a href="/" Return to Main Site
+      // Submit button
+      button.btn type="submit" Create Admin Account

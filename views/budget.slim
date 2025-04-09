@@ -1,88 +1,86 @@
-doctype html
-html
-  head
-    title Budget
-    link rel="stylesheet" href="/styles.css"
-    script src="/js/index.js"
-  body
-    .navbar
-      a href="/public_budgets"
-        button.btn-navbar Se andras budget
-      a href="/logout"
-        button.btn-navbar Logga ut
+// budget.slim
+//
+// Main budget management page
+// Allows users to add new budget items and view/edit existing ones
+
+layout :layout
+
+h1 Budget
+
+// Display error message if there is one
+- if session[:error]
+  .error-message = session[:error]
+  - session.delete(:error)
+
+// Form for adding a new budget item
+form action="/budget" method="post"
+  label for="category" Category:
+  select name="category" id="category"
+    option value="mat" Food
+    option value="transport" Transport
+    option value="nöje" Entertainment
+    option value="boende" Housing
+    option value="sparande" Savings/Investments
     
-    .container
-      .left-section
-        form action="/budget" method="post"
-          label for="category" Kategori:
-          select name="category" id="category"
-            option value="mat" Mat
-            option value="transport" Transport
-            option value="nöje" Nöje
-            option value="boende" Boende
-            option value="sparande" Sparande/Investerande
-          
-          .date-selection
-            label for="year" År:
-            select name="year" id="year" required=true
-              - @years.each do |year|
-                option value=year = year
-            
-            label for="month" Månad:
-            select name="month" id="month" required=true
-              - (1..12).each do |month|
-                option value=month = month
-            
-            label for="day" Dag:
-            select name="day" id="day" required=true
-              - (1..31).each do |day|
-                option value=day = day
-          
-          label for="amount" Summa:
-          input type="number" name="amount" id="amount" required=true
-          
-          label for="public" Offentlig:
-          input type="checkbox" name="public" id="public"
-          
-          button.btn type="submit" Lägg till budgetpost
-          
-      .right-section
-        h2 Din budgetöversikt
-        .chart-container
-          img src="/chart.png" alt="Budgetdiagram"
-        h1 Budget Overview
+  // Date selection fields
+  .date-selection
+    label for="year" Year:
+    select name="year" id="year" required=true
+      - @years.each do |year|
+        option value=year = year
         
-        - if session[:error]
-          .error-message = session[:error]
-          - session.delete(:error)
+    label for="month" Month:
+    select name="month" id="month" required=true
+      - (1..12).each do |month|
+        option value=month = month
         
-        table
-          thead
-            tr
-              th Kategori
-              th Summa
-              th Datum
-              th Offentlig
-              th Åtgärder
-          tbody
-            - @budgets.each do |budget|
-              tr
-                td = budget['Kategori']
-                td = budget['Summa']
-                td = budget['Datum']
-                td 
-                  - if budget['is_public'] == 1
-                    | Ja
-                    form action="/toggle_visibility/#{budget['id']}" method="post" style="display: inline;"
-                      button.small-btn type="submit" Gör privat
-                  - else
-                    | Nej
-                    form action="/toggle_visibility/#{budget['id']}" method="post" style="display: inline;"
-                      button.small-btn type="submit" Gör offentlig
-                td
-                  a href="/budget/#{budget['id']}/edit"
-                    button.small-btn Redigera
-                  form action="/budget/#{budget['id']}/delete" method="post" style="display: inline;" onsubmit="return confirm('Är du säker på att du vill ta bort denna budgetpost?');"
-                    button.small-btn.delete-btn type="submit" Ta bort
-        
-        a href="/" Home
+    label for="day" Day:
+    select name="day" id="day" required=true
+      - (1..31).each do |day|
+        option value=day = day
+    
+  // Amount field
+  label for="amount" Amount:
+  input type="number" name="amount" id="amount" required=true
+    
+  // Public/private toggle
+  label for="public" Public:
+  input type="checkbox" name="public" id="public"
+    
+  // Submit button
+  button.btn type="submit" Add Budget Item
+
+// Budget overview section
+h2 Your Budget Overview
+
+// Table of budget items
+table
+  thead
+    tr
+      th Category
+      th Amount
+      th Date
+      th Public
+      th Actions
+  tbody
+    - @budgets.each do |budget|
+      tr
+        td = budget['Kategori']
+        td = budget['Summa']
+        td = budget['Datum']
+        // Public/private status with toggle button
+        td
+          - if budget['is_public'] == 1
+            | Yes
+            form action="/toggle_visibility/#{budget['id']}" method="post" style="display: inline;"
+              button.small-btn type="submit" Make Private
+          - else
+            | No
+            form action="/toggle_visibility/#{budget['id']}" method="post" style="display: inline;"
+              button.small-btn type="submit" Make Public
+        // Action buttons for edit and delete
+        td
+          a href="/budget/#{budget['id']}/edit"
+            button.small-btn Edit
+          form action="/budget/#{budget['id']}/delete" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this budget item?');"
+            button.small-btn.delete-btn type="submit" Delete

@@ -1,24 +1,25 @@
-doctype html
-html
-  head
-    title Admin Login - Budget App
-    link rel="stylesheet" href="/styles.css"
-  body
-    .container.admin-login
-      h1 Admin Login
+// admin_login.slim
+//
+// Admin login page with form for username and password
+// Used for accessing the administrative dashboard
+
+.login-page
+  .login-container
+    h1 Admin Login
+    
+    // Show error message if there is one
+    - if @login_error
+      .error-message = @login_error
+    
+    // Admin login form
+    form action="/admin/login" method="post"
+      .form-group
+        label for="username" Username
+        input type="text" id="username" name="username" required="true"
       
-      - if @login_error
-        .error-message = @login_error
+      .form-group
+        label for="password" Password
+        input type="password" id="password" name="password" required="true"
       
-      form action="/admin/login" method="post"
-        .form-group
-          label for="username" Username
-          input type="text" id="username" name="username" required="true"
-        
-        .form-group
-          label for="password" Password
-          input type="password" id="password" name="password" required="true"
-        
-        button.btn type="submit" Login as Admin
-      
-      a href="/" Return to Main Site
+      // Submit button
+      button.btn type="submit" Login as Admin
