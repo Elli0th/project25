@@ -9,8 +9,6 @@ require_relative 'model/model'
 # Enable sessions
 enable :sessions
 
-set :session_secret, '7a6238b91650180c4a718d25f8faca5b64f0a2b41dc02bb8769c0bf8cc72d10f4393536375a41faaedeb0972827d8449e8b68358eb90b25f8fc6fa6f1375240b'
-
 # Set public folder
 set :public_folder, File.dirname(__FILE__) + '/public'
 
