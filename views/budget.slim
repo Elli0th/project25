@@ -12,46 +12,11 @@ h1 Budget
   .error-message = session[:error]
   - session.delete(:error)
 
-// Form for adding a new budget item
-form action="/budget" method="post"
-  label for="category" Category:
-  select name="category" id="category"
-    option value="mat" Food
-    option value="transport" Transport
-    option value="nöje" Entertainment
-    option value="boende" Housing
-    option value="sparande" Savings/Investments
-    
-  // Date selection fields
-  .date-selection
-    label for="year" Year:
-    select name="year" id="year" required=true
-      - @years.each do |year|
-        option value=year = year
-        
-    label for="month" Month:
-    select name="month" id="month" required=true
-      - (1..12).each do |month|
-        option value=month = month
-        
-    label for="day" Day:
-    select name="day" id="day" required=true
-      - (1..31).each do |day|
-        option value=day = day
-    
-  // Amount field
-  label for="amount" Amount:
-  input type="number" name="amount" id="amount" required=true
-    
-  // Public/private toggle
-  label for="public" Public:
-  input type="checkbox" name="public" id="public"
-    
-  // Submit button
-  button.btn type="submit" Add Budget Item
-
 // Budget overview section
 h2 Your Budget Overview
+
+a href="/budgets/new"
+  button.btn Add New Budget Item
 
 // Table of budget items
 table
@@ -65,7 +30,7 @@ table
   tbody
     - @budgets.each do |budget|
       tr
-        td = budget['Kategori']
+        td = budget['category_name']
         td = budget['Summa']
         td = budget['Datum']
         // Public/private status with toggle button
@@ -80,7 +45,8 @@ table
               button.small-btn type="submit" Make Public
         // Action buttons for edit and delete
         td
-          a href="/budget/#{budget['id']}/edit"
+          a href="/budgets/#{budget['id']}/edit"
             button.small-btn Edit
-          form action="/budget/#{budget['id']}/delete" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this budget item?');"
+          form action="/budgets/#{budget['id']}" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this budget item?');"
+            input type="hidden" name="_method" value="delete"
             button.small-btn.delete-btn type="submit" Delete

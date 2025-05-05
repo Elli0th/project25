@@ -11,16 +11,14 @@ h2 Edit Budget
   - session.delete(:error)
 
 // Edit form with current values pre-selected
-form action="/budget/#{@budget['id']}/update" method="post"
+form action="/budgets/#{@budget['id']}" method="post"
+  input type="hidden" name="_method" value="patch"
   // Category selection
   .form-group
     label for="category" Category:
     select name="category" id="category"
-      option value="mat" selected=(@budget['Kategori'] == 'mat') Food
-      option value="transport" selected=(@budget['Kategori'] == 'transport') Transport
-      option value="nöje" selected=(@budget['Kategori'] == 'nöje') Entertainment
-      option value="boende" selected=(@budget['Kategori'] == 'boende') Housing
-      option value="sparande" selected=(@budget['Kategori'] == 'sparande') Savings/Investments
+      - @categories.each do |cat|
+        option value=cat['id'] selected=(@budget['category_id'] == cat['id']) = cat['name']
           
   // Amount field
   .form-group
@@ -54,5 +52,5 @@ form action="/budget/#{@budget['id']}/update" method="post"
   // Action buttons
   .form-actions
     button.btn type="submit" Save Changes
-    a href="/budget"
+    a href="/budgets"
       button.btn type="button" Cancel

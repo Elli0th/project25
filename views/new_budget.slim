@@ -1,0 +1,47 @@
+// new_budget.slim
+//
+// Formulär för att lägga till en ny budgetpost
+
+h2 Add New Budget Item
+
+- if session[:error]
+  .error-message = session[:error]
+  - session.delete(:error)
+
+form action="/budgets" method="post"
+  label for="category" Category:
+  select name="category" id="category"
+    - @categories.each do |cat|
+      option value=cat['id'] = cat['name']
+  
+  // Date selection fields
+  .date-selection
+    label for="year" Year:
+    select name="year" id="year" required=true
+      - @years.each do |year|
+        option value=year = year
+    
+    label for="month" Month:
+    select name="month" id="month" required=true
+      - (1..12).each do |month|
+        option value=month = month
+    
+    label for="day" Day:
+    select name="day" id="day" required=true
+      - (1..31).each do |day|
+        option value=day = day
+  
+  // Amount field
+  label for="amount" Amount:
+  input type="number" name="amount" id="amount" required=true
+  
+  // Public/private toggle
+  label for="public" Public:
+  input type="checkbox" name="public" id="public"
+  
+  // Submit button
+  button.btn type="submit" Add Budget Item
+
+// Länk tillbaka
+a href="/budgets"
+  button.btn type="button" Cancel 
