@@ -70,28 +70,6 @@ function setupCsrfProtection() {
 }
 
 // Password related functions
-function togglePassword(id) {
-    const input = document.getElementById(id);
-    if (!input) return;
-
-    const button = input.nextElementSibling;
-    if (!button) return;
-
-    // Hitta SVG:erna
-    const classicEye = button.querySelector('.classic-eye');
-    const slashEye = button.querySelector('.slash-eye');
-
-    if (input.type === 'password') {
-        input.type = 'text';
-        if (classicEye) classicEye.style.display = 'none';
-        if (slashEye) slashEye.style.display = '';
-    } else {
-        input.type = 'password';
-        if (classicEye) classicEye.style.display = '';
-        if (slashEye) slashEye.style.display = 'none';
-    }
-}
-
 function checkPasswordStrength(password) {
     const strengthBar = document.querySelector('.strength-bar');
     const strengthText = document.querySelector('.strength-text');
@@ -181,19 +159,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initialize days on page load
         updateDays();
     }
-    
-    // Setup password toggle buttons
-    const toggleButtons = document.querySelectorAll('.password-toggle');
-    toggleButtons.forEach(button => {
-        if (!button.getAttribute('onclick')) {  // Only add listener if not using inline onclick
-            button.addEventListener('click', function() {
-                const input = this.previousElementSibling;
-                togglePassword(input.id);
-            });
-        }
-        // Set initial icon
-        button.innerHTML = '👁️‍🗨️';
-    });
     
     // Setup password strength meter
     const passwordInput = document.getElementById('password');

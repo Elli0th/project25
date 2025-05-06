@@ -60,11 +60,293 @@
       </div>
 
       <div id="content"><div id='filecontents'>
-<h1 id="label-project25">project25</h1>
+<h1 id="label-Budget+Application">Budget Application</h1>
+
+<p>En webbapplikation för att hantera personliga budgetar. Användare kan skapa, redigera och dela budgetposter, och se andras delade budgetinlägg.</p>
+
+<h2 id="label-Projektbeskrivning">Projektbeskrivning</h2>
+
+<p>Detta projekt är en budgetapplikation byggd med Ruby, Sinatra, SQLite och Slim. Applikationen följer MVC-designmönstret och inkluderar följande funktioner:</p>
+<ul><li>
+<p>Användarregistrering och inloggning</p>
+</li><li>
+<p>Skapa, redigera och ta bort budgetposter</p>
+</li><li>
+<p>Välja kategorier för budget från en databas</p>
+</li><li>
+<p>Dela budgetposter offentligt</p>
+</li><li>
+<p>Se andra användares delade budgetposter</p>
+</li><li>
+<p>Admin-panel för användarhantering</p>
+</li></ul>
+
+<h2 id="label-Mappstruktur">Mappstruktur</h2>
+
+<p>Projektet har följande mappstruktur:</p>
+<ul><li>
+<p><strong>/</strong>: Huvudmappen med app.rb (huvudkontroller)</p>
+</li><li>
+<p><strong>/model/</strong>: Innehåller model.rb med all databaslogik, validering och affärsregler</p>
+</li><li>
+<p><strong>/views/</strong>: Slim-mallar för all HTML-presentation</p>
+</li><li>
+<p>layout.slim: Huvudlayout för alla sidor</p>
+</li><li>
+<p>layout_navbar.slim: Navigation</p>
+</li><li>
+<p>user_login.slim &amp; user_register.slim: Användarautentisering</p>
+</li><li>
+<p>budget.slim, new_budget.slim, edit_budget.slim: Budget CRUD</p>
+</li><li>
+<p>public_budgets.slim: Visar andra användares offentliga budgetar</p>
+</li><li>
+<p>admin_login.slim, admin_dashboard.slim: Admin-funktionalitet</p>
+</li><li>
+<p><strong>/public/</strong>: Statiska filer</p>
+</li><li>
+<p>/css/: CSS-stilmallar</p>
+</li><li>
+<p>/js/: JavaScript-filer</p>
+</li><li>
+<p>/img/: Bilder för applikationen</p>
+</li><li>
+<p><strong>/db/</strong>: Innehåller SQLite-databasen och databasprojektfiler</p>
+</li></ul>
+
+<h2 id="label-Anv-C3-A4ndarroller">Användarroller</h2>
+
+<p>Applikationen har två användarroller:</p>
+
+<h3 id="label-Standardanv-C3-A4ndare">Standardanvändare</h3>
+<ul><li>
+<p>Kan registrera sig och logga in</p>
+</li><li>
+<p>Kan hantera egna budgetposter (skapa, redigera, ta bort)</p>
+</li><li>
+<p>Kan välja kategori för budgetposter</p>
+</li><li>
+<p>Kan göra budgetposter privata eller offentliga</p>
+</li><li>
+<p>Kan se andra användares offentliga budgetposter</p>
+</li></ul>
+
+<h3 id="label-Admin">Admin</h3>
+<ul><li>
+<p>Kan logga in via admin-sidan (/admin)</p>
+</li><li>
+<p>Kan se en lista över alla användare</p>
+</li><li>
+<p>Kan ta bort användarkonton</p>
+</li><li>
+<p>Kan inte radera sitt eget admin-konto</p>
+</li></ul>
+
+<h2 id="label-Installation+och+k-C3-B6rning">Installation och körning</h2>
+<ol><li>
+<p>Säkerställ att Ruby är installerat (minst version 2.6)</p>
+</li><li>
+<p>Klona detta repository</p>
+</li><li>
+<p>Installera beroenden: <code>bundle install</code></p>
+</li><li>
+<p>Kör applikationen: <code>ruby app.rb</code></p>
+</li><li>
+<p>Öppna <a href="http://localhost:4567">localhost:4567</a> i en webbläsare</p>
+</li></ol>
+
+<h3 id="label-Initial+admin-setup">Initial admin-setup</h3>
+
+<p>För att skapa det första admin-kontot:</p>
+<ol><li>
+<p>Gå till /setup/admin</p>
+</li><li>
+<p>Använd admin-nyckeln: <code>NoIjKY8It2eu1xURfwGx</code></p>
+</li><li>
+<p>Ange önskat användarnamn och lösenord</p>
+</li></ol>
+
+<h2 id="label-Krav+f-C3-B6r+anv-C3-A4ndning">Krav för användning</h2>
+<ul><li>
+<p>Ruby (minst 2.6)</p>
+</li><li>
+<p>Sinatra</p>
+</li><li>
+<p>SQLite3</p>
+</li><li>
+<p>BCrypt (för lösenordshashning)</p>
+</li><li>
+<p>Slim (för HTML-mallar)</p>
+</li></ul>
+
+<h2 id="label-YARD-dokumentation">YARD-dokumentation</h2>
+
+<p>Koden är dokumenterad enligt YARD-standarden. För att generera dokumentation:</p>
+<ol><li>
+<p>Installera YARD: <code>gem install yard</code></p>
+</li><li>
+<p>Generera dokumentation: <code>yard doc</code></p>
+</li><li>
+<p>Öppna dokumentationen i doc/index.html</p>
+</li></ol>
+
+<p>Dokumentationen innehåller: - Metodbeskrivningar - Parametertyper och beskrivningar - Returvärdesbeskrivningar - Exempel på användning</p>
+
+<h2 id="label-RESTful+Routes">RESTful Routes</h2>
+
+<p>Applikationen följer RESTful-principer för resurser:</p>
+<ul><li>
+<p><strong>GET /budgets</strong>: Lista alla budgetposter</p>
+</li><li>
+<p><strong>GET /budgets/new</strong>: Formulär för att skapa ny budgetpost</p>
+</li><li>
+<p><strong>POST /budgets</strong>: Skapa ny budgetpost</p>
+</li><li>
+<p><strong>GET /budgets/:id/edit</strong>: Formulär för att redigera budgetpost</p>
+</li><li>
+<p><strong>PATCH /budgets/:id</strong>: Uppdatera budgetpost</p>
+</li><li>
+<p><strong>DELETE /budgets/:id</strong>: Ta bort budgetpost</p>
+</li></ul>
+
+<h2 id="label-S-C3-A4kerhetsfunktioner">Säkerhetsfunktioner</h2>
+<ul><li>
+<p>BCrypt för säker lösenordslagring</p>
+</li><li>
+<p>Cooldown för inloggningsförsök (5 försök, 5 minuter cooldown)</p>
+</li><li>
+<p>Validering av användarnamn och lösenord</p>
+</li><li>
+<p>Skydd mot CSRF-attacker</p>
+</li><li>
+<p>Behörighetskontroll för känsliga routes</p>
+</li></ul>
+
+<h2 id="label-Databasschema">Databasschema</h2>
+
+<p>Databasen innehåller följande tabeller:</p>
+<ul><li>
+<p><strong>User</strong>: Användardata (id, Username, Password, is_admin)</p>
+</li><li>
+<p><strong>Budget</strong>: Budgetposter (id, category_id, user_id, Summa, Datum)</p>
+</li><li>
+<p><strong>Category</strong>: Budgetkategorier (id, name)</p>
+</li><li>
+<p><strong>Permissions</strong>: Behörigheter för budgetposter (id, budget_id, user_id, permission_type)</p>
+</li></ul>
+
+<h2 id="label-F-C3-B6rfattare">Författare</h2>
+
+<p>Ellioth Nyman</p>
+
+<h2 id="label-Projektstruktur">Projektstruktur</h2>
+<ul><li>
+<p><code>app.rb</code>: Huvudkontroller för Sinatra-applikationen. Hanterar routes och sessions.</p>
+</li><li>
+<p><code>model/</code>: Innehåller affärslogik och databasoperationer (t.ex. <code>model.rb</code>).</p>
+</li><li>
+<p><code>views/</code>: Slim-mallar för alla sidor och formulär.</p>
+</li><li>
+<p><code>public/</code>: Statisk front-end (CSS, JS, bilder).</p>
+</li><li>
+<p><code>db/</code>: Databasfiler och schema.</p>
+</li><li>
+<p><code>doc/</code>: Dokumentation, t.ex. ER-diagram och genererade HTML-dokument.</p>
+</li></ul>
+
+<h2 id="label-Databas+-26+ER-diagram">Databas &amp; ER-diagram</h2>
+<ul><li>
+<p>Se <code>doc/er-diagram.png</code> för aktuellt ER-diagram (lägg till denna fil efter att du skapat diagrammet).</p>
+</li><li>
+<p>Ny tabell: <code>Category</code> (kategori för budgetposter, används som foreign key i <code>Budget</code>).</p>
+</li></ul>
+
+<h2 id="label-Nya+funktioner+och+-C3-A4ndringar">Nya funktioner och ändringar</h2>
+<ul><li>
+<p>RESTful routes för budgetposter.</p>
+</li><li>
+<p>Kategorier hämtas dynamiskt från databasen.</p>
+</li><li>
+<p>Cooldown-funktionalitet vid inloggning.</p>
+</li><li>
+<p>Förbättrad validering av formulär.</p>
+</li><li>
+<p>Generellt before-block för inloggningskontroll.</p>
+</li></ul>
+
+<h2 id="label-ER-diagram">ER-diagram</h2>
+
+<p>Lägg till en bild på ditt ER-diagram här, t.ex. <code>doc/er-diagram.png</code>.</p>
+
+<p><strong>Mall för ER-diagram:</strong> - Rektanglar för tabeller: User, Budget, Category, Permissions - Pilar för relationer (t.ex. Budget har category_id som FK till Category) - Markera primärnycklar (PK) och främmande nycklar (FK)</p>
+
+<p>Exempel:</p>
+
+<pre class="code ruby"><code class="ruby">[User] 1---n [Budget] n---1 [Category]
+   |                |
+   |                n
+   |                |
+   n                [Permissions]
+</code></pre>
+
+<h2 id="label-Dokumentation+av+komplettering">Dokumentation av komplettering</h2>
+
+<h3 id="label-Mappar+och+filer">Mappar och filer</h3>
+<ul><li>
+<p><code>app.rb</code>: Huvudkontroller, hanterar routes, sessions, och logik.</p>
+</li><li>
+<p><code>model/model.rb</code>: Affärslogik och databasoperationer.</p>
+</li><li>
+<p><code>views/</code>: Slim-mallar för alla sidor och formulär.</p>
+</li><li>
+<p><code>public/</code>: Statisk front-end (CSS, JS, bilder).</p>
+</li><li>
+<p><code>db/</code>: Databasfiler och schema.</p>
+</li><li>
+<p><code>doc/</code>: Dokumentation, t.ex. ER-diagram och genererade HTML-dokument.</p>
+</li></ul>
+
+<h3 id="label-Viktiga+f-C3-B6r-C3-A4ndringar">Viktiga förändringar</h3>
+<ul><li>
+<p>RESTful routes för budgetposter.</p>
+</li><li>
+<p>Kategorier hämtas dynamiskt från databasen.</p>
+</li><li>
+<p>Cooldown-funktionalitet vid inloggning.</p>
+</li><li>
+<p>Förbättrad validering av formulär.</p>
+</li><li>
+<p>before-block för inloggningskontroll.</p>
+</li></ul>
+
+<h3 id="label-Exempel+p-C3-A5+problem+och+l-C3-B6sningar">Exempel på problem och lösningar</h3>
+<ul><li>
+<p><strong>Problem:</strong> Hårdkodade kategorier i formulär.</p>
+</li><li>
+<p><strong>Lösning:</strong> Skapade Category-tabell och hämtar kategorier dynamiskt.</p>
+</li><li>
+<p><strong>Problem:</strong> Bristande validering av formulär.</p>
+</li><li>
+<p><strong>Lösning:</strong> Lade till backend-validering för kategori, belopp och datum.</p>
+</li><li>
+<p><strong>Problem:</strong> Risk för brute force på login.</p>
+</li><li>
+<p><strong>Lösning:</strong> Införde cooldown efter 5 misslyckade försök.</p>
+</li></ul>
+
+<h3 id="label-Fels-C3-B6kning">Felsökning</h3>
+<ul><li>
+<p>Om en route inte fungerade efter RESTful-ändring, kontrollerade jag att alla länkar och formulär pekade på rätt path/metod.</p>
+</li><li>
+<p>Vid problem med kategorier, testade jag att lägga till/ändra poster och kontrollerade att rätt kategori-id sparades och visades.</p>
+</li></ul>
+<hr>
+
+<p><strong>Tips:</strong> Lägg till skärmdumpar på ER-diagram och ev. felmeddelanden/problem du löst!</p>
 </div></div>
 
       <div id="footer">
-  Generated on Wed Apr  9 19:25:46 2025 by
+  Generated on Tue May  6 08:20:24 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.3.6).
 </div>

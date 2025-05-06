@@ -47,11 +47,11 @@ end
 post '/login' do
   session[:login_attempts] ||= 0
   session[:last_attempt_time] ||= nil
-  cooldown_period = 300 # 5 minuter i sekunder
+  cooldown_period = 30 # 30 seconds
   max_attempts = 5
 
   if session[:login_attempts] >= max_attempts && session[:last_attempt_time] && Time.now.to_i - session[:last_attempt_time] < cooldown_period
-    @login_error = "För många misslyckade försök. Vänta några minuter innan du försöker igen."
+    @login_error = "För många misslyckade försök. Vänta ett par sekunder innan du försöker igen."
     return slim :user_login
   end
 
